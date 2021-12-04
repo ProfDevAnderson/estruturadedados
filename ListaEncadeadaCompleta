@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h> // Fazer comparação de strings
+// Criar uma lista de contatos (Agenda) | Listar todos | Buscar Contato por nome
+// Lista -> Alocação Din. | Struct | Ponteiro
+
+// 1 - Criar a struct
+struct contato {
+    char nome[50];
+    char telefone[16];
+    struct contato *prox;
+};
+typedef struct contato Contato;
+Contato *primeiro;
+int tamanho = 0;
+
+void adicionarContatoNoInicio() {
+    // Alocação dinâmica
+    Contato *contato = malloc(sizeof(Contato));
+    printf("\nNome: ");
+    scanf("%s", contato->nome);
+    printf("\nTelefone: ");
+    scanf("%s", contato->telefone);
+    contato->prox = primeiro;
+    primeiro = contato;
+    tamanho++;
+}
+
+void listarContatos(Contato *contato) {
+    if (contato != NULL) {
+        printf("\n%s - %s", contato->nome, contato->telefone);
+        listarContatos(contato->prox);
+    }
+}
+
+void buscarContatoPorNome(Contato *contato, char nome[]) {
+    if (contato != NULL) {
+        if (strcmp(contato->nome, nome) == 0) {
+            printf("\n%s - %s", contato->nome, contato->telefone);
+        }
+        buscarContatoPorNome(contato->prox, nome);
+    }
+}
+
+// Como seria a lógica para inserir no final da lista?
+void adicionarFim() {
+    Contato *contato = malloc(sizeof(Contato));
+    printf("\nNome: ");
+    scanf("%s", contato->nome);
+    printf("\nTelefone: ");
+    scanf("%s", contato->telefone);
+    contato->prox = NULL;
+    if (primeiro == NULL) {
+        primeiro = contato;
+    } else {
+        // Encontrar o ultimo
+        Contato *aux = primeiro;
+        while (aux->prox != NULL) {
+            aux = aux->prox;
+        }
+        // Aux é o ultimo elemento da lista
+        aux->prox = contato;
+    }
+    tamanho++;
+}
+
+void adicionarIndex(int index) {
+    if (index == 0) {
+        adicionarContatoNoInicio();
+    }else if (index > tamanho) {
+        printf("Index não existente");
+    } else {
+        Contato *aux = primeiro;
+        int i = 0;
+        while (i != index - 1) {
+            // Percorrer
+            aux = aux->prox;
+            i++;
+        }
+
+        // Criar o contato
+        Contato *contato = malloc(sizeof(Contato));
+        printf("\nNome: ");
+        scanf("%s", contato->nome);
+        printf("\nTelefone: ");
+        scanf("%s", contato->telefone);
+
+        contato->prox = aux->prox;
+        aux->prox = contato;
+        tamanho++;
+    }
+};
+
+void removeIndex(int index)
+{
+    if(index>tamanho || tamanho==0){
+        printf("Posição Inválida ou Lista Vazia");
+    }else{
+        Contato *contatoParaExcluir;
+        if(index==0){
+            contatoParaExcluir = primeiro;
+            primeiro = primeiro->prox;
+        }else{
+            Contato *listaAux = primeiro;
+            int i=0;
+            while(i!=index-1)
+            {
+                listaAux = listaAux->prox;
+                i++;
+            }
+            contatoParaExcluir = listaAux->prox;
+            listaAux->prox = listaAux->prox->prox;
+        }
+        free(contatoParaExcluir);
+        tamanho--;
+    }
+}
+
+int main() {
+        char nome[50];
+    adicionarIndex(0);
+    adicionarFim();
+    adicionarContatoNoInicio();
+    listarContatos(primeiro);
+    printf("\n Adicionando por Index");
+    adicionarIndex(1);
+    listarContatos(primeiro);
+    printf("\nBuscar Contato");
+    printf("\nDigite o nome: ");
+    scanf("%s", &nome);
+    buscarContatoPorNome(primeiro, nome);
+    printf("Remover contato 2");
+    removeIndex(2);
+    return 0;
+}
